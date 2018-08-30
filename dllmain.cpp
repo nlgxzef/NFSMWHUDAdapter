@@ -10,7 +10,6 @@ float ObjX, ObjY;
 void(__cdecl *FE_Object_SetCenter)(DWORD* FEObject, float _PositionX, float _PositionY) = (void(__cdecl*)(DWORD*, float, float))0x525050;
 void(__cdecl *FE_Object_GetCenter)(DWORD* FEObject, float *PositionX, float *PositionY) = (void(__cdecl*)(DWORD*, float*, float*))0x524EE0;
 void*(__cdecl *FEObject_FindObject)(const char *pkg_name, unsigned int obj_hash) = (void*(__cdecl*)(const char*, unsigned int))0x524850;
-int(__stdcall *cFEng_QueuePackageMessage)(unsigned int MessageHash, char const *FEPackageName, DWORD* FEObject) = (int(__stdcall*)(unsigned int, char const*, DWORD*))0x516C90;
 DWORD*(__cdecl *FEngGetScript)(char const * FNGName, unsigned int ObjectHash, unsigned int ScriptHash) = (DWORD*(__cdecl*)(char const*, unsigned int, unsigned int))0x5249D0;
 
 int __stdcall cFEng_QueuePackageMessage_Hook(unsigned int MessageHash, char const *FEPackageName, DWORD* FEObject)
@@ -26,6 +25,7 @@ int __stdcall cFEng_QueuePackageMessage_Hook(unsigned int MessageHash, char cons
 
 	float DifferenceMin = Difference * -1;
 
+	// Minimap
 	injector::WriteMemory<float*>(0x5678AA, &DifferenceMin, true);
 	injector::WriteMemory<float>(0x5678B4, DifferenceMin, true);
 	injector::WriteMemory<float*>(0x5678C6, &Difference, true);
@@ -52,11 +52,14 @@ int __stdcall cFEng_QueuePackageMessage_Hook(unsigned int MessageHash, char cons
 	if (EATraxChyron)
 	{
 		//cFEng_QueuePackageMessage(MessageHash, FEPackageName, FEObject);
-
+		
 		FE_Object_GetCenter(EATraxChyron, &ObjX, &ObjY);
-		FE_Object_SetCenter(EATraxChyron, ObjX + (Difference * 0.71f), ObjY);
-	}
+		printf("EA Trax Chyron at address %d found at %f, %f.", EATraxChyron, ObjX, ObjY);
+		FE_Object_SetCenter(EATraxChyron, ObjX - Difference, ObjY);
+		printf("EA Trax Chyron position is changed to %f, %f.", ObjX - Difference, ObjY);
+	}*/
 
+	/*
 	DWORD* WrongWaySign = (DWORD*)FEObject_FindObject(FEPackageName, 0xC82FA200); // "HUD_SingleRace.fng", WRONGWAYIMAGE
 
 	if (WrongWaySign)
@@ -78,11 +81,11 @@ void Init()
 	injector::MakeCALL(0x5696F1, cFEng_QueuePackageMessage_Hook, true);
 	injector::MakeCALL(0x569712, cFEng_QueuePackageMessage_Hook, true);
 
-	/* EA TRAX and WW sign are currently disabled, they don't work properly.
-	injector::MakeCALL(0x58D8C3, cFEng_QueuePackageMessage_Hook, true);
-	injector::MakeCALL(0x58D86F, cFEng_QueuePackageMessage_Hook, true);
-	injector::MakeCALL(0x58D7F7, cFEng_QueuePackageMessage_Hook, true);
-    */
+	/* EA TRAX and WW sign are currently disabled, they don't work properly.*/
+	//injector::MakeCALL(0x58D8C3, cFEng_QueuePackageMessage_Hook, true);
+	//injector::MakeCALL(0x58D86F, cFEng_QueuePackageMessage_Hook, true);
+	//injector::MakeCALL(0x58D7F7, cFEng_QueuePackageMessage_Hook, true);
+    
 }
 
 BOOL APIENTRY DllMain(HMODULE /*hModule*/, DWORD reason, LPVOID /*lpReserved*/)
